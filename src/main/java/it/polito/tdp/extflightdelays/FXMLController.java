@@ -1,8 +1,10 @@
 package it.polito.tdp.extflightdelays;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.extflightdelays.model.Airport;
 import it.polito.tdp.extflightdelays.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,10 +30,10 @@ public class FXMLController {
     private TextField compagnieMinimo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBoxAeroportoPartenza"
-    private ComboBox<?> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
+    private ComboBox<Airport> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBoxAeroportoDestinazione"
-    private ComboBox<?> cmbBoxAeroportoDestinazione; // Value injected by FXMLLoader
+    private ComboBox<Airport> cmbBoxAeroportoDestinazione; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalizza"
     private Button btnAnalizza; // Value injected by FXMLLoader
@@ -41,12 +43,34 @@ public class FXMLController {
 
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
-
+    	txtResult.clear();
+    	String xStr = compagnieMinimo.getText();
+    	int x;
+    	try {
+    		x = Integer.parseInt(xStr);    		
+    	}
+    	catch(NumberFormatException nfe) {
+    		txtResult.setText("Inserire un numero");
+    		return;
+    	}
+    	this.model.creaGrafo(x);
+    	this.cmbBoxAeroportoPartenza.getItems().addAll(model.getVertici());
+    	this.cmbBoxAeroportoDestinazione.getItems().addAll(model.getVertici());
     }
 
     @FXML
     void doTestConnessione(ActionEvent event) {
-
+    	Airport a1 = this.cmbBoxAeroportoPartenza.getValue();
+    	Airport a2 = this.cmbBoxAeroportoDestinazione.getValue();
+    	
+    	List<Airport> p = this.model.trovaPercorso(a1, a2);
+    	txtResult.clear();
+    	if(p != null) {
+    		for(Airport a : p)
+    			txtResult.appendText(a.toString() + "\n");
+    	}
+    	else
+    		txtResult.setText("Nessun percorso possibile");
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
