@@ -60,47 +60,71 @@ public class Model {
 	public List<Airport> trovaPercorso(Airport a1, Airport a2){
 		List<Airport> percorso = new LinkedList<>();
 		
-		BreadthFirstIterator<Airport, DefaultWeightedEdge> it = new BreadthFirstIterator<Airport, DefaultWeightedEdge>(grafo, a1);
+		BreadthFirstIterator<Airport, DefaultWeightedEdge> it 
+								= new BreadthFirstIterator<>(grafo, a1);
+		
 		
 		visita = new HashMap<>();
 		visita.put(a1, null);
 		
-		it.addTraversalListener(new TraversalListener<Airport, DefaultWeightedEdge>() {
-			
+		it.addTraversalListener(new TraversalListener<Airport, DefaultWeightedEdge>(){
+
 			@Override
-			public void vertexTraversed(VertexTraversalEvent<Airport> e) {}		
+			public void connectedComponentFinished(ConnectedComponentTraversalEvent e) {
+				
+			}
+
 			@Override
-			public void vertexFinished(VertexTraversalEvent<Airport> e) {}		
+			public void connectedComponentStarted(ConnectedComponentTraversalEvent e) {
+				
+			}
+
 			@Override
 			public void edgeTraversed(EdgeTraversalEvent<DefaultWeightedEdge> e) {
-				Airport sorgente = grafo.getEdgeSource(e.getEdge());
-				Airport destinazione = grafo.getEdgeTarget(e.getEdge());
+				Airport airport1 = grafo.getEdgeSource(e.getEdge());
+				Airport airport2 = grafo.getEdgeTarget(e.getEdge());
 				
-				if(visita.containsKey(sorgente) && !visita.containsKey(destinazione)) {
-					visita.put(sorgente, destinazione);
-				}
-				else if(visita.containsKey(destinazione) && !visita.containsKey(sorgente)) {
-					visita.put(destinazione, sorgente);
+				if(visita.containsKey(airport1) && !visita.containsKey(airport2)) {
+					visita.put(airport2, airport1);
+				} else if (visita.containsKey(airport2) && !visita.containsKey(airport1)){
+					visita.put(airport1, airport2);
 				}
 			}
+
 			@Override
-			public void connectedComponentStarted(ConnectedComponentTraversalEvent e) {}		
+			public void vertexTraversed(VertexTraversalEvent<Airport> e) {
+				
+			}
+
 			@Override
-			public void connectedComponentFinished(ConnectedComponentTraversalEvent e) {}
+			public void vertexFinished(VertexTraversalEvent<Airport> e) {
+				
+			}
+
+				
 		});
 		
+		//visito il grafo
 		while(it.hasNext()) {
 			it.next();
 		}
 		
-		if(!visita.containsKey(a1) || !visita.containsKey(a2))
-			return null;
 		
+		//ottengo il percorso dall'albero di visita
+		
+		//se uno dei due aeroporti non è presente nell'albero di visita
+		//   -> non c'è nessun percorso
+		if(!visita.containsKey(a1) || !visita.containsKey(a2)) {
+			return null;
+		}
+		
+		//altrimenti, parto dal fondo e "risalgo" l'albero
 		percorso.add(a2);
 		Airport step = a2;
-		while(visita.get(step) != null) {
+		
+		while (visita.get(step) != null) {
 			step = visita.get(step);
-			percorso.add(0, step);
+			percorso.add(0,step);
 		}
 		
 		return percorso;

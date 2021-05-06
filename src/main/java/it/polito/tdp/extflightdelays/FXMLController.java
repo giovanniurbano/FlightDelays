@@ -60,17 +60,28 @@ public class FXMLController {
 
     @FXML
     void doTestConnessione(ActionEvent event) {
-    	Airport a1 = this.cmbBoxAeroportoPartenza.getValue();
-    	Airport a2 = this.cmbBoxAeroportoDestinazione.getValue();
-    	
-    	List<Airport> p = this.model.trovaPercorso(a1, a2);
     	txtResult.clear();
-    	if(p != null) {
-    		for(Airport a : p)
-    			txtResult.appendText(a.toString() + "\n");
+    	Airport a1 = cmbBoxAeroportoPartenza.getValue();
+    	if(a1 == null) {
+    		txtResult.setText("Seleziona un aeroporto di partenza");
+    		return;
     	}
-    	else
-    		txtResult.setText("Nessun percorso possibile");
+    	
+    	Airport a2 = cmbBoxAeroportoDestinazione.getValue();
+    	if(a2 == null) {
+    		txtResult.setText("Seleziona un aeroporto di destinazione");
+    		return;
+    	}
+    	
+    	List<Airport> percorso = model.trovaPercorso(a1, a2);
+    	
+    	if(percorso == null) {
+    		txtResult.setText("I due nodi non sono collegati");
+    	} 
+    	else{
+    		txtResult.appendText(a1 + " e " + a2 + " sono collegati dal seguente percorso:\n\n");
+    		txtResult.appendText(percorso.toString());
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
